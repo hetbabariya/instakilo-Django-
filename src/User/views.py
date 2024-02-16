@@ -1,8 +1,9 @@
 import datetime
+import re
 from tokenize import Token
 # from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-
+from django.db.models import Q
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
@@ -10,6 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from django.core.paginator import Paginator
 
 from random import randint
 from datetime import datetime , timedelta
@@ -19,6 +21,7 @@ from django.conf import settings
 
 from .models import Otp , User
 from Post.models import PostPermission
+from .serializer import SearchUserSerializer
 
 class CreateUser(APIView):
     def post(self , request):
@@ -204,3 +207,23 @@ class DeleteUser(APIView):
 class UpdateUser(APIView):
     authentication_classes = (TokenAuthentication,)
     pass
+
+
+
+class SearchUserView(APIView):
+
+    def get(self , request ):
+        username = request.query_params.get('username')
+
+        if username is None :
+            return Response({"msg" : "None type User"} , status=status.HTTP_400_BAD_REQUEST)
+        
+        user_data = User.objects.filter(Q(username__contains = username)).all()
+        # user_serializer = SearchUserSerializer(user_data , many = True)
+        
+        p = Paginator(user_data, 5)
+        
+        page_obj = p.page(1)
+        
+        user_serializer = SearchUserSerializer(page_obj, many=True)
+        return Response({"user" : user_serializer.data}, status=status.HTTP_200_OK)

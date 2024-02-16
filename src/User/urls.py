@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CreateUser , LoginUser , LogoutUser , ChangePassword , ForgetPassword , DeleteUser , UpdateUser , SendOtp , VerifyOtp
+from .views import CreateUser , LoginUser , LogoutUser , ChangePassword , ForgetPassword , DeleteUser , UpdateUser , SendOtp , VerifyOtp , SearchUserView
 
 urlpatterns = [
     path('create-user',CreateUser.as_view()),
@@ -11,4 +11,5 @@ urlpatterns = [
     path('forget-password',ForgetPassword.as_view()),
     path('delete-user',DeleteUser.as_view()),
     path('update-user',UpdateUser.as_view()),
+    path('search-user',SearchUserView.as_view()),
 ]
